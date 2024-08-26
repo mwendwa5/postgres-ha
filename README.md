@@ -48,7 +48,7 @@ show pool_nodes;
 ```
 The database password can be specified during installation by including it in values.yaml file. 
 
-A database employees will be created by executing the sql files in the repo and other 2 tables. These are related by a foreign key using the staff_no column.
+An employees database will be created by executing the sql files in the repo and other 2 tables. These are related by a foreign key using the staff_no column.
 
 Execute the python script to populate the tables with 100,000 records. Modify the host endpoint details as required.
 
