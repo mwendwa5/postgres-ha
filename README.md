@@ -32,7 +32,7 @@ When installation is complete, there will be 3 postgresql nodes, and 1 pgpool no
 kubectl port-forward --namespace default svc/hadbcluster-postgresql-ha-pgpool 5432:5432
 ```
 
-We can connect to the database using psql on localhost.
+Connect to the database using psql on localhost.
 ```console
 psql -h 127.0.0.1 -p 5432 -U postgres -d postgres
 ```
@@ -41,13 +41,13 @@ The database password can be retrieved using the command below.
 ```console
 kubectl get secret --namespace default hadbcluster-postgresql-ha-postgresql -o jsonpath="{.data.password}" | base64 -d
 ```
-Since this is the pgpool instance, we can check the status of the other nodes by using this query.
+Since this is the pgpool instance, check the status of the other nodes by using this query.
 ```console
 show pool_nodes;
 ```
-We can also specify the database password during installation by specifying it in values.yaml file. 
+The database password can be specified during installation by including it in values.yaml file. 
 
-Create a database e.g. employees and execute the sql files in the repo to create the 2 tables. These are related by a foreign key using the staff_no column.
+A database employees will be created by executing the sql files in the repo and other 2 tables. These are related by a foreign key using the staff_no column.
 
 Execute the python script to populate the tables with 100,000 records. Modify the host endpoint details as required.
 
@@ -66,10 +66,14 @@ We can check the status and logs of the pods.
 kubectl get po
 kubectl logs dbrepl-postgresql-0
 ```
-
-We can connect directly to the replica database using instructions from helm and confirm the replication status as below.
+Using pg_basebackup, configure assynchronous replication. Get the repmgr password in a similar way as the main postgres password above.
 ```console
-helm status dbrepl  #get the command needed to connect to the database
+export PGPASSWORD=sRIMdHWFey
+pg_basebackup -h hadbcluster-postgresql-0.my-release-postgresql-ha-postgresql-headless -p 5432 -U repmgr -D /bitnami/postgresql/data -Fp -Xs -R
+```
+Connect directly to the replica database using instructions from helm and confirm the replication status as below.
+```console
+helm status dbrepl 							 #get the command needed to connect to the database
 postgres=# select state, client_hostname, write_lag, replay_lag, flush_lag  FROM pg_stat_replication;
 postgres=# select pg_is_in_recovery();
 ```
