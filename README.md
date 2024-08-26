@@ -78,7 +78,7 @@ Using `pg_basebackup`, configure asynchronous replication. Confirm the master ho
 export PGPASSWORD=sRIMdHWFey
 pg_basebackup -h hadbcluster-postgresql-0.my-release-postgresql-ha-postgresql-headless -p 5432 -U repmgr -D /bitnami/postgresql/data -Fp -Xs -R
 ```
-Connect directly to the replica database using instructions from helm and confirm the replication status as below.
+Connect directly to the replica database using instructions from `helm status` and confirm the replication status as below.
 ```console
 helm status dbrepl 							 #get the command needed to connect to the database
 postgres=# select state, client_hostname, write_lag, replay_lag, flush_lag  FROM pg_stat_replication;
