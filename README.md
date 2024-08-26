@@ -1,2 +1,76 @@
-# postgres-ha
-This is a deployment of PostgreSQL HA cluster using helm
+# Postgres High Availability deployment using Helm Charts
+This deployment uses the postgresql-ha chart from Bitnami.
+
+This is the architectural diagram of how the solution looks like.
+<img  width="400px" height=auto src= "postgreshatopoloty.png" />
+
+##Instructions
+
+### Prerequisites
+
+- Minikube v1.33.1
+- Helm 3.15.4
+
+### Install postgresql-ha chart
+For simplicity, we will add an alias to kubectl as below.
+```console
+alias kubectl='minikube kubectl --'
+```
+Add bitnami repository
+```console
+helm repo add bitnami https://charts.bitnami.com/bitnami
+```
+
+Install postgresql-ha chart
+```console
+helm install hadbcluster oci://registry-1.docker.io/bitnamicharts/postgresql-ha
+```
+
+When installation is complete, there will be 3 postgresql nodes, and 1 pgpool node. The address of internal connections will be displayed on the screen. To connect from outside the cluster, we need to perform port forwarding by running the commands below.
+
+```console
+kubectl port-forward --namespace default svc/hadbcluster-postgresql-ha-pgpool 5432:5432
+```
+
+We can connect to the database using psql on localhost.
+```console
+psql -h 127.0.0.1 -p 5432 -U postgres -d postgres
+```
+
+The database password can be retrieved using the command below.
+```console
+kubectl get secret --namespace default hadbcluster-postgresql-ha-postgresql -o jsonpath="{.data.password}" | base64 -d
+```
+Since this is the pgpool instance, we can check the status of the other nodes by using this query.
+```console
+show pool_nodes;
+```
+We can also specify the database password during installation by specifying it in values.yaml file. 
+
+Create a database e.g. employees and execute the sql files in the repo to create the 2 tables. These are related by a foreign key using the staff_no column.
+
+Execute the python script to populate the tables with 100,000 records. Modify the host endpoint details as required.
+
+### Deployment of the standalone replica 
+The values.yaml file will be used to make this deployment. It contains options for setting up the server as a replica, as well as the master postgres password.
+```console
+helm install -f values.yaml dbrepl bitnami/postgresql
+```
+We can check the status of the instance using the helm status command
+```console
+helm ls
+helm status dbrepl
+```
+We can check the status and logs of the pods.
+```console
+kubectl get po
+kubectl logs dbrepl-postgresql-0
+```
+
+We can connect directly to the replica database using instructions from helm and confirm the replication status as below.
+```console
+helm status dbrepl  #get the command needed to connect to the database
+postgres=# select state, client_hostname, write_lag, replay_lag, flush_lag  FROM pg_stat_replication;
+postgres=# select pg_is_in_recovery();
+```
+
