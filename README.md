@@ -69,6 +69,10 @@ We can check the status and logs of the pods.
 kubectl get po
 kubectl logs dbrepl-postgresql-0
 ```
+Connect to the instance.
+```console
+kubectl exec -it dbrepl-postgresql-0 /opt/bitnami/scripts/postgresql/entrypoint.sh /bin/bash
+```
 Using `pg_basebackup`, configure asynchronous replication. Confirm the master host from pgpool and get it's address. Get the `repmgr` password in a similar way as the main `postgres` password above.
 ```console
 export PGPASSWORD=sRIMdHWFey
