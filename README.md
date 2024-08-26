@@ -48,18 +48,18 @@ Since this is the pgpool instance, check the status of the other nodes by using 
 ```console
 show pool_nodes;
 ```
-The database password can be specified during installation by including it in values.yaml file. 
+The database password can be specified during installation by including it in `values.yaml` file. 
 
-An employees database will be created by executing the sql files in the repo and other 2 tables. These are related by a foreign key using the staff_no column.
+An `employees` database will be created by executing the sql files in the repo and other 2 tables. These are related by a foreign key using the `staff_no` column.
 
 Execute the python script to populate the tables with 100,000 records. Modify the host endpoint details as required.
 
 ### Deployment of the standalone replica 
-The values.yaml file will be used to make this deployment. It contains options for setting up the server as a replica, as well as the master postgres password.
+The `values.yaml` file will be used to make this deployment. It contains options for setting up the server as a replica, as well as the master postgres password.
 ```console
 helm install -f values.yaml dbrepl bitnami/postgresql
 ```
-We can check the status of the instance using the helm status command
+We can check the status of the instance using the `helm status` command
 ```console
 helm ls
 helm status dbrepl
@@ -69,7 +69,7 @@ We can check the status and logs of the pods.
 kubectl get po
 kubectl logs dbrepl-postgresql-0
 ```
-Using pg_basebackup, configure assynchronous replication. Confirm the master host from pgpool and get it's address. Get the repmgr password in a similar way as the main postgres password above.
+Using `pg_basebackup`, configure asynchronous replication. Confirm the master host from pgpool and get it's address. Get the `repmgr` password in a similar way as the main `postgres` password above.
 ```console
 export PGPASSWORD=sRIMdHWFey
 pg_basebackup -h hadbcluster-postgresql-0.my-release-postgresql-ha-postgresql-headless -p 5432 -U repmgr -D /bitnami/postgresql/data -Fp -Xs -R
