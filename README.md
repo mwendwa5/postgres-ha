@@ -11,6 +11,8 @@ This is the architectural diagram of how the solution looks like.
 - Minikube v1.33.1
 - Helm 3.15.4
 
+P.S. The charts used below are included in this repo in the directory `charts`.
+
 ### Install postgresql-ha chart
 For simplicity, we will add an alias to kubectl as below.
 ```console
