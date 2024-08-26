@@ -26,9 +26,10 @@ Install postgresql-ha chart
 helm install hadbcluster oci://registry-1.docker.io/bitnamicharts/postgresql-ha
 ```
 
-When installation is complete, there will be 3 postgresql nodes, and 1 pgpool node. The address of internal connections will be displayed on the screen. To connect from outside the cluster, we need to perform port forwarding by running the commands below.
+When installation is complete, there will be 3 postgresql nodes, and 1 pgpool node. The address of internal connections will be displayed on the screen. Check the status of the pods using the command below. Also, to connect from outside the cluster, we need to perform port forwarding by running the next command.
 
 ```console
+kubectl get pod
 kubectl port-forward --namespace default svc/hadbcluster-postgresql-ha-pgpool 5432:5432
 ```
 
@@ -66,7 +67,7 @@ We can check the status and logs of the pods.
 kubectl get po
 kubectl logs dbrepl-postgresql-0
 ```
-Using pg_basebackup, configure assynchronous replication. Get the repmgr password in a similar way as the main postgres password above.
+Using pg_basebackup, configure assynchronous replication. Confirm the master host from pgpool and get it's address. Get the repmgr password in a similar way as the main postgres password above.
 ```console
 export PGPASSWORD=sRIMdHWFey
 pg_basebackup -h hadbcluster-postgresql-0.my-release-postgresql-ha-postgresql-headless -p 5432 -U repmgr -D /bitnami/postgresql/data -Fp -Xs -R
